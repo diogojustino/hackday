@@ -65,4 +65,27 @@ public class BancoController {
         db.close();
         return calendarios;
     }
+
+    public void deletaRegistro(long id){
+        String where = CriarBanco.ID + "=" + id;
+        db = banco.getReadableDatabase();
+        db.delete(CriarBanco.TABELA,where,null);
+        db.close();
+    }
+    public void alteraRegistro(Long id, String dataInicio, String dataFim){
+        ContentValues valores;
+        String where;
+
+        db = banco.getWritableDatabase();
+
+        where = CriarBanco.ID + "=" + id;
+
+        valores = new ContentValues();
+        valores.put(CriarBanco.DATA_INICIO, dataInicio);
+        valores.put(CriarBanco.DATA_FIM, dataFim);
+
+        db.update(CriarBanco.TABELA,valores,where,null);
+        db.close();
+    }
+
 }

@@ -2,6 +2,8 @@ package br.com.codtech.hackday.activity.adapter
 
 import android.content.Intent
 import android.database.Cursor
+import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,7 +41,6 @@ class ListCalendarioAdapter(private val activity: MainActivity) : BaseAdapter() 
 
 
         list = crud.carregaDados();
-        activity.alerta("teste!!", Toast.LENGTH_SHORT)
         if(list == null){
             activity.alerta("Calendarios Vazios!!", Toast.LENGTH_SHORT)
         }else{
@@ -89,21 +90,32 @@ class ListCalendarioAdapter(private val activity: MainActivity) : BaseAdapter() 
 
         // Label
         var textDataFim= view?.findViewById<TextView>(R.id.text_data_fim)
-        textDataFim?.text = calendario!!.dataInicio
+        textDataFim?.text = calendario!!.dataFim
 
         // Edit button
         var editButton = view?.findViewById<ImageButton>(R.id.editButton)
         editButton?.setOnClickListener {
             var intent = Intent(activity, AdicionarCalendarioActivity::class.java)
-            intent.extras.putSerializable("instance", calendario)
+            var bundle: Bundle = Bundle()
+            bundle.putSerializable("instance", calendario)
+            intent.putExtras(bundle)
             activity.startActivity(intent)
         }
 
-        // Remove button
+
         var removeButton = view?.findViewById<ImageButton>(R.id.removeButton)
         removeButton?.setOnClickListener {
 
-            // Remover do BD
+            // Usando o Snackbar para confirmar a remoção
+            Snackbar.make(view!!, "Deseja remover esta calendario?", Snackbar.LENGTH_LONG).setAction("Sim", {
+
+
+
+                val crud: BancoController = BancoController(activity.baseContext)
+                crud.deletaRegistro(calendario!!.id);
+                activity.alerta("Calendario removida com sucesso!", Toast.LENGTH_SHORT)
+                dataUpdate()
+            }).show()
 
 
         }

@@ -11,11 +11,13 @@ import android.widget.Toast;
 import br.com.codtech.hackday.R;
 import br.com.codtech.hackday.activity.adapter.ListCalendarioAdapter;
 import br.com.codtech.hackday.activity.dao.BancoController;
+import br.com.codtech.hackday.activity.model.Calendario;
 
 public class AdicionarCalendarioActivity extends ModeloActivity {
     private Button buttonSalvar;
     private EditText editDataInicio;
     private EditText editDataFim;
+    private Calendario calendario;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,7 +25,12 @@ public class AdicionarCalendarioActivity extends ModeloActivity {
         buttonSalvar = findViewById(R.id.button_salvar);
         editDataInicio = findViewById(R.id.edit_data_inicio);
         editDataFim = findViewById(R.id.edit_data_fim);
-
+        Bundle bundle = getIntent().getExtras();
+        if(bundle != null){
+            calendario = (Calendario) bundle.getSerializable("instance");
+            editDataInicio.setText(calendario.getDataInicio());
+            editDataFim.setText(calendario.getDataFim());
+        }
         buttonSalvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -37,16 +44,20 @@ public class AdicionarCalendarioActivity extends ModeloActivity {
                     alerta("Data De Inicio esta Vazia", Toast.LENGTH_LONG);
                     return;
                 }
-
                 BancoController crud = new BancoController(getBaseContext());
-                try{
-                    crud.insereDado(dataInicio, dataFim);
-                }catch (RuntimeException runtimeException) {
-                    alerta(runtimeException.getMessage(), Toast.LENGTH_SHORT);
+                if(calendario == null) {
 
-                    finish();
+                    try {
+                        crud.insereDado(dataInicio, dataFim);
+                    } catch (RuntimeException runtimeException) {
+                        alerta(runtimeException.getMessage(), Toast.LENGTH_SHORT);
+                    }
+                }else{
+
+                    crud.alteraRegistro(calendario.getId(), dataInicio, dataFim);
+                    alerta("Atualizado com sucesso", Toast.LENGTH_SHORT);
                 }
-
+                finish();
             }
         });
     }
